@@ -1,11 +1,8 @@
 
-import fs from 'fs';
 import path from 'path';
 import * as cliProgress from 'cli-progress';
 
 import { UploaderProvider } from './providers';
-
-const packagejson = require('../package.json')
 
 export class UI {
     csvFiles: string[];

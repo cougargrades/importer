@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import readline from 'readline'
 import parse from 'csv-parse'
 
 export class CSVReader {
