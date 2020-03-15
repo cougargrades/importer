@@ -1,18 +1,31 @@
 
+import chalk from 'chalk'
+
 import blessed from 'blessed';
 import contrib from 'blessed-contrib'
 
 import { CSVReader } from './reader'
 import { API } from './api'
+import { LineDataProvider, UploaderProvider } from './providers';
 
 const packagejson = require('../package.json')
 
 export class UI {
     csvFiles: string[];
+    lineProvider: LineDataProvider;
+    uploaderProvider: UploaderProvider;
+    
     screen: blessed.Widgets.Screen;
+    line: any;
+    log: any;
 
     constructor(csvFiles: string[]) {
+        // Initialize data streams
         this.csvFiles = csvFiles;
+        this.lineProvider = new LineDataProvider(this.onRealTimeUpdate.bind(this), 5000);
+        this.uploaderProvider = new UploaderProvider(csvFiles);
+
+        // Setup UI
         this.screen = blessed.screen({
             smartCSR: true
         });
@@ -22,31 +35,15 @@ export class UI {
         });
     }
 
-    draw(): void {
-        // Create a box perfectly centered horizontally and vertically.
-        // var box = blessed.box({
-        //     top: 'center',
-        //     left: 'center',
-        //     width: '50%',
-        //     height: '50%',
-        //     content: 'Hello {bold}world{/bold}!',
-        //     tags: true,
-        //     border: {
-        //         type: 'line'
-        //     },
-        //     style: {
-        //         fg: 'white',
-        //         bg: 'magenta',
-        //         border: {
-        //             fg: '#f0f0f0'
-        //         },
-        //         hover: {
-        //             bg: 'green'
-        //         }
-        //     }
-        // });
+    onRealTimeUpdate(meta:any, data: any): void {
+        this.log.log(chalk.yellow(`upload_queue_meta: ${meta}`))
+        //let latestEntry = data.x[data.x.length-1];
+        //this.line.setData(data);
+        //this.log.log(latestEntry);
+    }
 
-        const line = contrib.line({
+    draw(): void {
+        this.line = contrib.line({
             top: 0,
             left: 'center',
             width: '100%',
@@ -62,17 +59,13 @@ export class UI {
             wholeNumbersOnly: true,
             label: 'Pending Imports'
         })
-        this.screen.append(line)
-        line.setData([{
-            x: ['t1', 't2', 't3', 't4'],
-            y: [5, 1, 7, 5]
-        }])
+        this.screen.append(this.line)
 
-        const log = contrib.log({
+        this.log = contrib.log({
             bottom: 0,
             left: 'center',
             width: '100%',
-            height: '50%',
+            height: '80%',
             fg: 'green',
             selectedFg: 'green',
             label: 'Import Log',
@@ -81,10 +74,22 @@ export class UI {
             },
         });
 
-        log.log("new log line");
+        this.uploaderProvider.each((res) => {
+            
+            let i = this.uploaderProvider.uploadedRecords;
+            let n = this.uploaderProvider.totalRecords;
+            let message = `${i/n * 100}% --- ${res.data} (${i} of ${n})`
+
+            if(res.success) {
+                this.log.log(chalk.cyan(message))
+            }
+            else {
+                this.log.log(chalk.redBright(message))
+            }
+        })
         
         // Append our box to the screen.
-        this.screen.append(log);
+        this.screen.append(this.log);
     }
     
     render(): void {
