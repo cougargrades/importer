@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import program from 'commander'
 import figlet from 'figlet'
 
-import { UI } from './ui'
+import { App } from './app'
 import { API } from './api'
 
 const packagejson = require('../package.json')
@@ -16,10 +16,11 @@ program
     .arguments('<csv...>')
     .option('--host <url>','Use this host instead of the default.', '<none>')
     .option('--verify','When enabled, only validate the access token and exit.', false)
+    .option('--redis', 'Redis information', 'redis://127.0.0.1:6379')
     .option('--token <access_token>','Specify your access token for upload permissions. Must have permissions to use: `PUT /api/private/CSV`. This can also be specified with the ACCESS_TOKEN environment variable.','<none>')
     .action(async csv => {
+        let api = new API(program.token, true);
         if(program.verify) {
-            let api = new API(program.token, true);
             let serverToken = await api.self();
             if(serverToken === null) {
                 throw "This access token is invalid, or did not have permissions to access `GET /private/tokens/self`."
@@ -27,16 +28,19 @@ program
             console.log(serverToken)
             process.exit(0);
         }
-
-        const ui = new UI(csv);
         if(program.host !== '<none>') {
-            ui.uploaderProvider.api.baseUrl = program.host;
+            api.baseUrl = program.host;
         }
         if(program.token !== '<none>') {
-            ui.uploaderProvider.api.accessToken = program.token;
+            api.accessToken = program.token;
         }
 
-        ui.render();
+        const app = new App({
+            api: api,
+            csvFiles: csv,
+            redis: program.redis
+        });
+        app.start();
     })
     .parse(process.argv);
 
