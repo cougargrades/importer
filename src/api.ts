@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import * as qs from 'query-string'
 
 export class API {
@@ -26,17 +26,17 @@ export class API {
         }
     }
     
-    async get(endpoint: string = '/', querystring: object = {}): Promise<any> {
+    async get(endpoint: string = '/', querystring: object = {}): Promise<Response> {
         let res = await fetch(`${this.baseUrl}${endpoint}?${qs.stringify(querystring)}`, {
             method: 'get',
             headers: {
                 'X-Access-Token': this.accessToken
             }
         })
-        return await res.json()
+        return res
     }
 
-    async post(endpoint: string = '/', body: object = {}): Promise<any> {
+    async post(endpoint: string = '/', body: object = {}): Promise<Response> {
         let res = await fetch(`${this.baseUrl}${endpoint}`, {
             method: 'post',
             headers: {
@@ -45,10 +45,10 @@ export class API {
             },
             body: JSON.stringify(body)
         })
-        return await res.json()
+        return res
     }
 
-    async put(endpoint: string = '/', body: object = {}): Promise<any> {
+    async put(endpoint: string = '/', body: object = {}): Promise<Response> {
         let res = await fetch(`${this.baseUrl}${endpoint}`, {
             method: 'put',
             headers: {
@@ -57,10 +57,10 @@ export class API {
             },
             body: JSON.stringify(body)
         })
-        return await res.json()
+        return res
     }
 
-    async delete(endpoint: string = '/', body: object = {}): Promise<any> {
+    async delete(endpoint: string = '/', body: object = {}): Promise<Response> {
         let res = await fetch(`${this.baseUrl}${endpoint}`, {
             method: 'delete',
             headers: {
@@ -69,6 +69,6 @@ export class API {
             },
             body: JSON.stringify(body)
         })
-        return await res.json()
+        return res
     }
 }
