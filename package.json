@@ -1,0 +1,51 @@
+{
+  "name": "importer",
+  "version": "2.0.0",
+  "description": "Imports data into cougargrades.io",
+  "main": "./lib/index.js",
+  "bin": {
+    "cougarimport": "./lib/index.js"
+  },
+  "scripts": {
+    "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "build": "tsc -p .",
+    "watch": "nodemon --watch src/ --ext js,mjs,json,ts --exec 'clear; npm run build'",
+    "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cougargrades/importer.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cougargrades/importer/issues"
+  },
+  "homepage": "https://github.com/cougargrades/importer#readme",
+  "dependencies": {
+    "@types/bull": "^3.12.1",
+    "@types/bull-board": "^0.6.0",
+    "@types/cli-progress": "^3.4.2",
+    "@types/express": "^4.17.3",
+    "@types/node": "^13.9.1",
+    "@types/node-fetch": "^2.5.5",
+    "bull": "^3.13.0",
+    "bull-board": "^0.7.0",
+    "chalk": "^3.0.0",
+    "cli-progress": "^3.6.0",
+    "commander": "^5.0.0",
+    "csv-parse": "^4.8.8",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "get-port": "^5.1.1",
+    "node-fetch": "^2.6.0",
+    "open": "^7.0.3",
+    "query-string": "^6.11.1",
+    "stream-transform": "^2.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3"
+  }
+}
