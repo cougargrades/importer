@@ -6,19 +6,24 @@ export class API {
     accessToken: string;
     constructor(accessToken: string = '<none>', testing: boolean = false) {
         this.baseUrl = testing 
-                        ? 'https://us-central1-cougargrades-testing.cloudfunctions.net/api' 
-                        : 'https://us-central1-cougargrades-aefb6.cloudfunctions.net/api';
+                        ? 'https://cougargrades-testing.web.app/api'
+                        : 'https://cougargrades-aefb6.web.app/api';
         this.accessToken = accessToken;
     }
 
     async self(): Promise<any> {
-        let res = await fetch(`${this.baseUrl}/private/tokens/self`, {
-            method: 'get',
-            headers: {
-                'X-Access-Token': this.accessToken
-            }
-        })
-        return (res.status === 200) ? await res.json() : null;
+        try {
+            let res = await fetch(`${this.baseUrl}/private/tokens/self`, {
+                method: 'get',
+                headers: {
+                    'X-Access-Token': this.accessToken
+                }
+            })
+            return (res.status === 200) ? await res.json() : null;
+        }
+        catch(err) {
+            return null;
+        }
     }
     
     async get(endpoint: string = '/', querystring: object = {}): Promise<any> {
