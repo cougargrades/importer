@@ -60,7 +60,7 @@ export class App {
         let clock = setInterval(async () => {
             let remaining = await this.uploaderProvider.queue.count()
             pbar_upload.update(n - remaining, { filename: 'Bull/Redis queue progress' })
-            if(remaining === 0) {
+            if(remaining === 0 && i >= n) {
                 clearInterval(clock)
                 mbars.stop()
                 cp.kill()
