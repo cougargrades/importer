@@ -13,6 +13,7 @@ import chalk from 'chalk';
 import { Server } from 'http';
 const info = chalk.grey
 const success = chalk.greenBright.bold;
+const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class App {
     csvFiles: string[];
@@ -59,6 +60,8 @@ export class App {
             i++
         })
 
+        await snooze(5000);
+
         let clock = setInterval(async () => {
             let remaining = await this.uploaderProvider.queue.count()
             pbar_upload.update(n - remaining, { filename: 'Bull/Redis queue progress' })
@@ -75,7 +78,7 @@ export class App {
                     ))
                 process.exit(0);
             }
-        }, 500)
+        }, 1000)
     }
 
     // see: https://stackoverflow.com/a/8212878
