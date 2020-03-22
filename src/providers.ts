@@ -1,5 +1,4 @@
 
-import os from 'os';
 import chalk from 'chalk';
 
 import { API } from "./api";
@@ -48,7 +47,8 @@ export class UploaderProvider {
         })
     }
 
-    each(callback: (data: any) => any) {
+    // old way, can have weird race conditions
+    eachRow(callback: (data: any) => any) {
         for(let reader of this.readers) {
             reader.eachRow(async (row) => {
                 let job = await this.queue.add(row, {
@@ -61,6 +61,29 @@ export class UploaderProvider {
                 callback(job)
             })
         }
+    }
+
+    async allRows(callback: (data: Bull.Job<any>) => void) {
+        // literally load every row into memory like a fucking madlad
+        // const proms = []
+        // for(let reader of this.readers) {
+        //     proms.push(reader.allRows())
+        // }
+
+        const payload = (await Promise.all(this.readers.map(e => e.allRows()))).flat();
+        for(let row of payload.flat()) {
+            // add to redis synchronously (dont risk failed transfers)
+            callback(
+                await this.queue.add(row, {
+                    attempts: 3,
+                    backoff: {
+                        type: 'exponential',
+                        delay: 5000
+                    }
+                })
+            )
+        }
+        return
     }
 }
 

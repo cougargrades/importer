@@ -10,6 +10,7 @@ export class CSVReader {
         this.numberOfLines = fs.readFileSync(this.filePath).toString().split('\n').length // sorta hacky
     }
     
+    // old way, can have weird race conditions upstream
     async eachRow(callback: (row: object) => any) {
         const parser = parse({
             columns: true
@@ -19,5 +20,21 @@ export class CSVReader {
         for await (const record of parser) {
             callback(record)
         }
+    }
+
+    allRows(): Promise<object[]> {
+        return new Promise((resolve, reject) => {
+            const parser = parse({
+                columns: true
+            }, (err, records) => {
+                if(err) {
+                    reject(err)
+                }
+                else {
+                    resolve(records)
+                }
+            })
+            fs.createReadStream(path.resolve(this.filePath)).pipe(parser)
+        })
     }
 }

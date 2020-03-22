@@ -27,5 +27,5 @@ not yet ;-)
     
     `docker run -d --restart unless-stopped -p 6379:6379 redis:latest `
 
-- Node.js 10
+- Node.js 11
 - An `access_token` for the cougargrades.io API (v2.0.0)

@@ -47,16 +47,16 @@ export class App {
         let n = this.uploaderProvider.totalRecords
         console.log(info('Copying rows to Bull/Redis for processing. Inspect upload progress there.'))
         const start_time = new Date();
-        const mbars = new MultiBar({
+        let mbars = new MultiBar({
             format: '{percentage}% |{bar}| {value}/{total} | ETA: {eta}s | Elapsed: {duration}s',
             fps: 30,
             clearOnComplete: false,
             hideCursor: false
         }, Presets.shades_classic)
-        const pbar_copy   = mbars.create(n, i, undefined);
-        const pbar_upload = mbars.create(n, i, undefined);
-        this.uploaderProvider.each((res) => {
-            pbar_copy.update(i, { filename: 'copy to Bull/Redis' })
+        let pbar_copy   = mbars.create(n, 0, {});
+        let pbar_upload = mbars.create(n, 0, {});
+        this.uploaderProvider.allRows((res) => {
+            pbar_copy.increment(1, { filename: 'copy to Bull/Redis' })
             i++
         })
 
@@ -68,15 +68,13 @@ export class App {
             if(remaining === 0 && i >= n) {
                 clearInterval(clock)
                 mbars.stop()
-                cp.kill()
-                this.server?.close();
                 const delta = new Date().valueOf() - start_time.valueOf()
                 const rate = n / (delta / 1000)
                 console.log(success(
                     `Upload finished in ${App.getRelativeTime(delta)} (${(delta/1000).toFixed(3)} seconds).\n` +
-                    `The average rate was ${rate.toFixed(2)} rows/second.`
+                    `The average rate was ${rate.toFixed(2)} rows/second.\n` +
+                    `Press CTRL+C to close the importer.`
                     ))
-                process.exit(0);
             }
         }, 1000)
     }
