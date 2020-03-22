@@ -73,7 +73,7 @@ export class App {
                 const delta = new Date().valueOf() - start_time.valueOf()
                 const rate = n / (delta / 1000)
                 console.log(success(
-                    `Upload finished ${App.getRelativeTime(delta)} (${(delta/1000).toFixed(3)} seconds).\n` + 
+                    `Upload finished in ${App.getRelativeTime(delta)} (${(delta/1000).toFixed(3)} seconds).\n` +
                     `The average rate was ${rate.toFixed(2)} rows/second.`
                     ))
                 process.exit(0);

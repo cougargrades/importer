@@ -17,9 +17,18 @@ program
     .option('--jobs <integer>', 'Number of concurrent uploads to make. Defaults to # of CPU cores.', `${os.cpus().length}`)
     .option('--verbose', 'When enabled, certain logging will be more verbose.', false)
     .option('--redis <connection>', 'Redis information', 'redis://127.0.0.1:6379')
-    .option('--token <access_token>','Specify your access token for upload permissions. Must have permissions to use: `PUT /api/private/CSV`. This can also be specified with the ACCESS_TOKEN environment variable.','<none>')
+    .option('--token <access_token>','Specify your access token for upload permissions. Must have permissions to use: `PUT /api/private/CSV`. This can also be specified with the ACCESS_TOKEN environment variable.',`<none>`)
     .action(async csv => {
         let api = new API(program.token, true);
+        if(program.host !== '<none>') {
+            api.baseUrl = program.host;
+        }
+        if(program.token !== '<none>') {
+            api.accessToken = program.token;
+        }
+        else if(process.env.ACCESS_TOKEN && process.env.ACCESS_TOKEN.length > 0 && process.env.ACCESS_TOKEN !== '<none>') {
+            api.accessToken = process.env.ACCESS_TOKEN;
+        }
         if(program.verify) {
             if(program.verbose) console.log(`Checking token: ${api.accessToken}`)
             let serverToken = await api.self();
@@ -30,12 +39,6 @@ program
                 console.log(serverToken)
             }
             process.exit(0);
-        }
-        if(program.host !== '<none>') {
-            api.baseUrl = program.host;
-        }
-        if(program.token !== '<none>') {
-            api.accessToken = program.token;
         }
 
         const app = new App({
