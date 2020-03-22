@@ -11,11 +11,11 @@ not yet ;-)
 
 ## Usage
 
-Install the command-line tool with npm:
+- Install the command-line tool with npm:
 
     `npm install -g @cougargrades/importer`
 
-For arguments, run:
+- For arguments, run:
 
     `cougarimport --help`
 
