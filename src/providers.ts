@@ -18,8 +18,10 @@ export class UploaderProvider {
     public totalRecords: number = 0;
     public uploadedRecords: number = 0;
     public queue: Bull.Queue;
+    public jobs: number;
 
     constructor(options: UploaderProviderOptions) {
+        this.jobs = options.jobs;
         this.api = options.api;
         this.readers = options.csvFiles.map(e => new CSVReader(e))
         for(let reader of this.readers) {
@@ -39,29 +41,11 @@ export class UploaderProvider {
         this.queue.clean(1, 'failed')
         setQueues([this.queue]);
 
-        const x = this.cpuCount()
-        console.log(note(`Bull concurrency set to ${x}`))
+        console.log(note(`Bull concurrency set to ${this.jobs}`))
 
-        this.queue.process(x, async (job: any) => {
+        this.queue.process(this.jobs, async (job: any) => {
             return await this.api.put('/private/CSV', job.data)
         })
-    }
-
-    cpuCount(): number {
-        const cpu_count = os.cpus().length
-        const cpus = Array.from(new Set(os.cpus().map(e => e.model)))
-        console.log(info(`Logical cores: ${cpu_count}`))
-        if(cpus.length === 1) {
-            console.log(info(`Detected CPU: ${cpus[0]}`))
-        }
-        else {
-            console.log(info(`Detected CPUs:`))
-            for(let proc of cpus) {
-                console.log(`\t- ${proc}`)
-            }
-        }
-
-        return os.cpus().length
     }
 
     each(callback: (data: any) => any) {
@@ -84,4 +68,5 @@ export interface UploaderProviderOptions {
     api: API;
     csvFiles: string[];
     redis: string;
+    jobs: number;
 }

@@ -1,3 +1,4 @@
+import os from 'os';
 
 import { API } from './api';
 import { UploaderProvider } from './providers';
@@ -24,7 +25,8 @@ export class App {
         this.uploaderProvider = new UploaderProvider({
             api: options.api || new API(),
             csvFiles: options.csvFiles || [],
-            redis: options.redis || 'redis://127.0.0.1:6379'
+            redis: options.redis || 'redis://127.0.0.1:6379',
+            jobs: options.jobs || os.cpus().length
         });
     }
 
@@ -115,4 +117,5 @@ export interface AppOptions {
     api?: API;
     csvFiles?: string[];
     redis?: string;
+    jobs?: number;
 }

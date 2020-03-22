@@ -116,4 +116,6 @@ dist
 
 lib/
 .vscode/
-large_sample.csv
+!sample.csv
+*.csv
+#large_sample.csv
