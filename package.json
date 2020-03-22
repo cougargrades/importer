@@ -2,9 +2,9 @@
   "name": "@cougargrades/importer",
   "version": "2.0.2",
   "description": "Imports data into cougargrades.io",
-  "main": "./lib/index.js",
+  "main": "./dist/index.js",
   "bin": {
-    "cougarimport": "./lib/index.js"
+    "cougarimport": "./dist/index.js"
   },
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",

@@ -76,7 +76,7 @@ export class App {
                     `Press CTRL+C to close the importer.`
                     ))
             }
-        }, 1000)
+        }, 5000)
     }
 
     // see: https://stackoverflow.com/a/8212878
