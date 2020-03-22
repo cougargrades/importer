@@ -1,4 +1,7 @@
 # @cougargrades/importer
+
+[![npm](https://img.shields.io/npm/v/@cougargrades/importer)](https://www.npmjs.com/@cougargrades/importer)
+
 Imports data into cougargrades.io
 
 Rewritten in TypeScript to supersede the original Python importer tool.
