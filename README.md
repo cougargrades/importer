@@ -10,7 +10,7 @@ Original tool: https://github.com/cougargrades/importer-python
 
 ## Demo
 
-<a href="https://youtu.be/Q8kkSWf34Ww"><img src="img/demo.png" height="200"/></a>
+<a href="https://youtu.be/Q8kkSWf34Ww"><img src="img/demo.png" height="400"/></a>
 
 ## Usage
 
@@ -27,5 +27,5 @@ Original tool: https://github.com/cougargrades/importer-python
     
     `docker run -d --restart unless-stopped -p 6379:6379 redis:latest `
 
-- Node.js 11
-- An `access_token` for the cougargrades.io API (v2.0.0)
+- Node.js 11+
+- An `access_token` for the cougargrades.io API (v2.0.0). Access tokens are only granted on request.
