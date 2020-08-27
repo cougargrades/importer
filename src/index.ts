@@ -56,6 +56,5 @@ program
             jobs: parseInt(program.jobs)
         });
         await app.start();
-        process.exit(0);
     })
     .parse(process.argv);
