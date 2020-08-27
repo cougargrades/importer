@@ -71,7 +71,7 @@ export class UploaderProvider {
 
     async allRows(callback: (data: Bull.Job<any>) => void) {
         // literally load every row into memory like a fucking madlad
-        const payload = (await Promise.all(this.readers.map(e => e.allRows()))).flat();
+        const payload = await Promise.all(this.readers.map(e => e.allRows()));
         for(let row of payload.flat()) {
             // add to redis synchronously (dont risk failed transfers)
             callback(

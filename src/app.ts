@@ -60,23 +60,24 @@ export class App {
             i++
         })
 
-        await snooze(5000);
+        //await snooze(5000);
 
-        let clock = setInterval(async () => {
+        for(;;) {
             let remaining = await this.uploaderProvider.queue.count()
             pbar_upload.update(n - remaining, { filename: 'Bull/Redis queue progress' })
             if(remaining === 0 && i >= n) {
-                clearInterval(clock)
+                await snooze(1000);
                 mbars.stop()
                 const delta = new Date().valueOf() - start_time.valueOf()
                 const rate = n / (delta / 1000)
                 console.log(success(
                     `Upload finished in ${App.getRelativeTime(delta)} (${(delta/1000).toFixed(3)} seconds).\n` +
-                    `The average rate was ${rate.toFixed(2)} rows/second.\n` +
-                    `Press CTRL+C to close the importer.`
+                    `The average rate was ${rate.toFixed(2)} rows/second.`
                     ))
+                this.server?.close();
+                return;
             }
-        }, 5000)
+        }
     }
 
     // see: https://stackoverflow.com/a/8212878

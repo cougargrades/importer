@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import parse from 'csv-parse'
+import { GradeDistributionCSVRow } from '@cougargrades/types'
 
 export class CSVReader {
     filePath: string;
@@ -22,8 +23,8 @@ export class CSVReader {
         }
     }
 
-    allRows(): Promise<object[]> {
-        return new Promise((resolve, reject) => {
+    allRows(): Promise<GradeDistributionCSVRow[]> {
+        return new Promise((resolve: (value: GradeDistributionCSVRow[]) => any, reject) => {
             const parser = parse({
                 columns: true
             }, (err, records) => {
@@ -42,8 +43,28 @@ export class CSVReader {
                             }
                         }
                     }
+                    // read the rows into the typed object
+                    let formatted: GradeDistributionCSVRow[] = [];
+                    for(let item of records) {
+                        formatted.push(new GradeDistributionCSVRow(
+                            item['TERM'],
+                            item['SUBJECT'],
+                            item['CATALOG_NBR'],
+                            parseInt(item['CLASS_SECTION']),
+                            item['COURSE_DESCR'],
+                            item['INSTR_LAST_NAME'],
+                            item['INSTR_FIRST_NAME'],
+                            parseInt(item['A']),
+                            parseInt(item['B']),
+                            parseInt(item['C']),
+                            parseInt(item['D']),
+                            parseInt(item['F']),
+                            parseInt(item['TOTAL_DROPPED']),
+                            parseFloat(item['AVG_GPA'])
+                        ));
+                    }
                     // send it off
-                    resolve(records)
+                    resolve(formatted);
                 }
             })
             fs.createReadStream(path.resolve(this.filePath)).pipe(parser)

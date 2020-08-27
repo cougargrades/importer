@@ -55,6 +55,7 @@ program
             redis: program.redis,
             jobs: parseInt(program.jobs)
         });
-        app.start();
+        await app.start();
+        process.exit(0);
     })
     .parse(process.argv);
