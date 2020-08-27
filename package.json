@@ -1,6 +1,6 @@
 {
   "name": "@cougargrades/importer",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Imports data into cougargrades.io",
   "main": "./dist/index.js",
   "bin": {
