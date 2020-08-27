@@ -31,6 +31,18 @@ export class CSVReader {
                     reject(err)
                 }
                 else {
+                    // for every record
+                    for(let i = 0; i < records.length; i++) {
+                        // convert column names that have spaces to underscores
+                        for(let key of Object.keys(records[i])) {
+                            let sanitized_key = key.replace(/ /g, '_');
+                            if(sanitized_key !== key) {
+                                records[i][sanitized_key] = records[i][key];
+                                delete records[i][key];
+                            }
+                        }
+                    }
+                    // send it off
                     resolve(records)
                 }
             })

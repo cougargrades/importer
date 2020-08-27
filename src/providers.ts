@@ -43,7 +43,7 @@ export class UploaderProvider {
         console.log(note(`Bull concurrency set to ${this.jobs}`))
 
         this.queue.process(this.jobs, async (job: Bull.Job) => {
-            let res = await this.api.put('/private/CSV', job.data);
+            let res = await this.api.put('/private/GradeDistributionCSVRow', job.data);
             if(res.status === 200) {
                 return await res.json()
             }
