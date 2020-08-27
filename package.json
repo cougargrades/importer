@@ -1,6 +1,6 @@
 {
   "name": "@cougargrades/importer",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Imports data into cougargrades.io",
   "main": "./dist/index.js",
   "bin": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/cougargrades/importer#readme",
   "dependencies": {
+    "@cougargrades/types": "0.0.37",
     "@types/bull": "^3.12.1",
     "@types/bull-board": "^0.6.0",
     "@types/cli-progress": "^3.4.2",

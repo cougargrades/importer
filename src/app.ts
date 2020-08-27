@@ -13,7 +13,7 @@ import chalk from 'chalk';
 import { Server } from 'http';
 const info = chalk.grey
 const success = chalk.greenBright.bold;
-const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+//const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class App {
     csvFiles: string[];
@@ -40,7 +40,7 @@ export class App {
         this.server = app.listen(port)
         
         console.log(info(`Listening on port: http://127.0.0.1:${port}`))
-        let cp = await open(`http://127.0.0.1:${port}`)
+        await open(`http://127.0.0.1:${port}`)
         console.log(info('Launched bull-board in browser'))
 
         let i = 1
@@ -60,13 +60,10 @@ export class App {
             i++
         })
 
-        await snooze(5000);
-
-        let clock = setInterval(async () => {
+        for(;;) {
             let remaining = await this.uploaderProvider.queue.count()
             pbar_upload.update(n - remaining, { filename: 'Bull/Redis queue progress' })
             if(remaining === 0 && i >= n) {
-                clearInterval(clock)
                 mbars.stop()
                 const delta = new Date().valueOf() - start_time.valueOf()
                 const rate = n / (delta / 1000)
@@ -75,8 +72,9 @@ export class App {
                     `The average rate was ${rate.toFixed(2)} rows/second.\n` +
                     `Press CTRL+C to close the importer.`
                     ))
+                break;
             }
-        }, 5000)
+        }
     }
 
     // see: https://stackoverflow.com/a/8212878

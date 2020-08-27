@@ -43,7 +43,7 @@ export class UploaderProvider {
         console.log(note(`Bull concurrency set to ${this.jobs}`))
 
         this.queue.process(this.jobs, async (job: Bull.Job) => {
-            let res = await this.api.put('/private/CSV', job.data);
+            let res = await this.api.put('/private/GradeDistributionCSVRow', job.data);
             if(res.status === 200) {
                 return await res.json()
             }
@@ -71,7 +71,7 @@ export class UploaderProvider {
 
     async allRows(callback: (data: Bull.Job<any>) => void) {
         // literally load every row into memory like a fucking madlad
-        const payload = (await Promise.all(this.readers.map(e => e.allRows()))).flat();
+        const payload = await Promise.all(this.readers.map(e => e.allRows()));
         for(let row of payload.flat()) {
             // add to redis synchronously (dont risk failed transfers)
             callback(
