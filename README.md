@@ -10,7 +10,7 @@ Original tool: https://github.com/cougargrades/importer-python
 
 ## Demo
 
-<a href="https://youtu.be/Q8kkSWf34Ww"><img src="img/demo.png" height="400" width="711" /></a>
+<a href="https://youtu.be/Q8kkSWf34Ww"><img src="img/demo.png" width="300" /></a>
 
 ## Usage
 
