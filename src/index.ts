@@ -51,7 +51,7 @@ program
     const details = await bundle.extract(file)    
     const app = new App({
       api: api,
-      csvFiles: [],
+      csvFiles: details.csvFiles,
       patchFiles: details.patchFiles,
       redis: program.redis,
       jobs: parseInt(program.jobs)

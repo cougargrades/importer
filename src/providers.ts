@@ -43,30 +43,25 @@ export class UploaderProvider {
     console.log(note(`Bull concurrency set to ${this.jobs}`))
 
     this.queue.process(this.jobs, async (job: Bull.Job) => {
-      let res = await this.api.put('/private/GradeDistributionCSVRow', job.data);
-      if (res.status === 200) {
-        return await res.json()
+      if(job.data['format'] === 'io.cougargrades.publicdata.patch') {
+        let res = await this.api.post('/private/Patchfile', job.data);
+        if (res.status === 200) {
+          return await res.text()
+        }
+        else {
+          await job.moveToFailed({ message: await res.text() })
+        }
       }
       else {
-        await job.moveToFailed({ message: await res.text() })
+        let res = await this.api.put('/private/GradeDistributionCSVRow', job.data);
+        if (res.status === 200) {
+          return await res.json()
+        }
+        else {
+          await job.moveToFailed({ message: await res.text() })
+        }
       }
     })
-  }
-
-  // old way, can have weird race conditions
-  eachRow(callback: (data: any) => any) {
-    for (let reader of this.readers) {
-      reader.eachRow(async (row) => {
-        let job = await this.queue.add(row, {
-          attempts: 5,
-          backoff: {
-            type: 'fixed',
-            delay: 5000
-          }
-        })
-        callback(job)
-      })
-    }
   }
 
   async allRows(callback: (data: Bull.Job<any>) => void) {
