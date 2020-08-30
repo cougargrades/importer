@@ -1,8 +1,10 @@
 import os from 'os';
+import fs from 'fs';
+import util from 'util';
 
 import { API } from './api';
 import { UploaderProvider } from './providers';
-import { MultiBar, Presets } from 'cli-progress';
+import { MultiBar, SingleBar, Presets } from 'cli-progress';
 
 import express from 'express';
 import { UI } from 'bull-board';
@@ -13,10 +15,12 @@ import chalk from 'chalk';
 import { Server } from 'http';
 const info = chalk.grey
 const success = chalk.greenBright.bold;
-//const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const pretty = chalk.cyanBright.bold;
+const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class App {
     csvFiles: string[];
+    patchFiles: string[][];
     uploaderProvider: UploaderProvider;
     server?: Server;
     headless: boolean;
@@ -24,6 +28,7 @@ export class App {
     constructor(options: AppOptions) {
         // Initialize data streams
         this.csvFiles = options.csvFiles || [];
+        this.patchFiles = options.patchFiles || [];
         this.uploaderProvider = new UploaderProvider({
             api: options.api || new API(),
             csvFiles: options.csvFiles || [],
@@ -73,12 +78,31 @@ export class App {
         const rate = n / (delta / 1000)
         console.log(success(
           `Upload finished in ${App.getRelativeTime(delta)} (${(delta/1000).toFixed(3)} seconds).\n` +
-          `The average rate was ${rate.toFixed(2)} rows/second.\n` +
-          `Press CTRL+C to close the importer.`
+          `The average rate was ${rate.toFixed(2)} rows/second.`
           ))
         break;
       }
     }
+
+    console.log('Waiting 60 seconds to allow `upload_queue` to process first.');
+    await snooze(60 * 1000);
+
+    console.log(pretty('Executing patch files ...'));
+
+    let patchpbar = new SingleBar({
+      format: '{percentage}% |{bar}| {value}/{total} | ETA: {eta}s | Elapsed: {duration}s',
+      fps: 30,
+      clearOnComplete: false,
+      hideCursor: false
+    }, Presets.shades_classic);
+    patchpbar.start(this.patchFiles.flat().length, 0);
+    for(let i = 0; i < this.patchFiles.length; i++) {
+      for(let j = 0; j < this.patchFiles[i].length; j++) {
+        await this.uploaderProvider.api.post('/private/Patchfile', JSON.parse(fs.readFileSync(this.patchFiles[i][j], { encoding: 'utf8' })));
+        patchpbar.increment();
+      }
+    }
+    patchpbar.stop();
   }
 
   // see: https://stackoverflow.com/a/8212878
@@ -119,6 +143,7 @@ export class App {
 export interface AppOptions {
     api?: API;
     csvFiles?: string[];
+    patchFiles?: string[][];
     redis?: string;
     jobs?: number;
     headless: boolean;
