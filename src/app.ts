@@ -53,7 +53,7 @@ export class App {
         }
 
     let i = 1
-    let n = this.uploaderProvider.totalRecords
+    let n = this.uploaderProvider.totalRecords;
     console.log(info('Copying rows to Bull/Redis for processing. Inspect upload progress there.'))
     const start_time = new Date();
     let mbars = new MultiBar({
@@ -84,25 +84,17 @@ export class App {
       }
     }
 
-    console.log('Waiting 60 seconds to allow `upload_queue` to process first.');
-    await snooze(60 * 1000);
-
     console.log(pretty('Executing patch files ...'));
 
-    let patchpbar = new SingleBar({
-      format: '{percentage}% |{bar}| {value}/{total} | ETA: {eta}s | Elapsed: {duration}s',
-      fps: 30,
-      clearOnComplete: false,
-      hideCursor: false
-    }, Presets.shades_classic);
-    patchpbar.start(this.patchFiles.flat().length, 0);
-    for(let i = 0; i < this.patchFiles.length; i++) {
-      for(let j = 0; j < this.patchFiles[i].length; j++) {
-        await this.uploaderProvider.api.post('/private/Patchfile', JSON.parse(fs.readFileSync(this.patchFiles[i][j], { encoding: 'utf8' })));
-        patchpbar.increment();
-      }
+    for(let item of this.patchFiles.flat()) {
+      this.uploaderProvider.queue.add(JSON.parse(fs.readFileSync(item, { encoding: 'utf8' })), {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000
+        }
+      });
     }
-    patchpbar.stop();
   }
 
   // see: https://stackoverflow.com/a/8212878
