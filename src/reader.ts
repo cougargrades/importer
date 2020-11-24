@@ -43,6 +43,9 @@ export class CSVReader {
               }
             }
           }
+
+          const is_nullish = (x: any) => x === null || x === undefined || x === '' || isNaN(parseInt(x));
+
           // read the rows into the typed object
           let formatted: GradeDistributionCSVRow[] = [];
           for (let item of records) {
@@ -54,13 +57,13 @@ export class CSVReader {
               COURSE_DESCR: item['COURSE_DESCR'],
               INSTR_LAST_NAME: item['INSTR_LAST_NAME'],
               INSTR_FIRST_NAME: item['INSTR_FIRST_NAME'],
-              A: parseInt(item['A']),
-              B: parseInt(item['B']),
-              C: parseInt(item['C']),
-              D: parseInt(item['D']),
-              F: parseInt(item['F']),
-              TOTAL_DROPPED: parseInt(item['TOTAL_DROPPED']),
-              AVG_GPA: parseFloat(item['AVG_GPA'])
+              A: is_nullish(item['A']) ? 0 : parseInt(item['A']),
+              B: is_nullish(item['B']) ? 0 : parseInt(item['B']),
+              C: is_nullish(item['C']) ? 0 : parseInt(item['C']),
+              D: is_nullish(item['D']) ? 0 : parseInt(item['D']),
+              F: is_nullish(item['F']) ? 0 : parseInt(item['F']),
+              TOTAL_DROPPED: is_nullish(item['TOTAL_DROPPED']) ? 0 : parseInt(item['TOTAL_DROPPED']),
+              AVG_GPA: is_nullish(item['AVG_GPA']) ? 0 : parseInt(item['AVG_GPA'])
             });
           }
           // send it off
