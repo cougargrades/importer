@@ -133,18 +133,10 @@ export class App {
 }
 
 export interface AppOptions {
-<<<<<<< HEAD
     api?: API;
     csvFiles?: string[];
     patchFiles?: string[][];
     redis?: string;
     jobs?: number;
     headless: boolean;
-=======
-  api?: API;
-  csvFiles?: string[];
-  patchFiles?: string[][];
-  redis?: string;
-  jobs?: number;
->>>>>>> 57adf1f9d8d39b0d99993fe52bf030060bf66d74
 }
