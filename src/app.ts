@@ -1,6 +1,7 @@
 import os from 'os';
 import fs from 'fs';
 import util from 'util';
+import readline from 'readline';
 
 import { API } from './api';
 import { UploaderProvider } from './providers';
@@ -19,38 +20,40 @@ const pretty = chalk.cyanBright.bold;
 const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class App {
-    csvFiles: string[];
-    patchFiles: string[][];
-    uploaderProvider: UploaderProvider;
-    server?: Server;
-    headless: boolean;
+  csvFiles: string[];
+  patchFiles: string[][];
+  uploaderProvider: UploaderProvider;
+  server?: Server;
+  headless: boolean;
+  localPort: number;
 
-    constructor(options: AppOptions) {
-        // Initialize data streams
-        this.csvFiles = options.csvFiles || [];
-        this.patchFiles = options.patchFiles || [];
-        this.uploaderProvider = new UploaderProvider({
-            api: options.api || new API(),
-            csvFiles: options.csvFiles || [],
-            redis: options.redis || 'redis://127.0.0.1:6379',
-            jobs: options.jobs || os.cpus().length
-        });
-        this.headless = options.headless;
+  constructor(options: AppOptions) {
+    // Initialize data streams
+    this.csvFiles = options.csvFiles || [];
+    this.patchFiles = options.patchFiles || [];
+    this.uploaderProvider = new UploaderProvider({
+      api: options.api || new API(),
+      csvFiles: options.csvFiles || [],
+      redis: options.redis || 'redis://127.0.0.1:6379',
+      jobs: options.jobs || os.cpus().length
+    });
+    this.headless = options.headless;
+    this.localPort = options.localPort || 0;
+  }
+
+  async start(): Promise<void> {
+    console.log(info('Starting application!'))
+    // Setup UI
+    const app = express()
+    this.localPort = this.localPort || await getPort();
+    app.use('/', UI)
+    this.server = app.listen(this.localPort)
+    
+    console.log(info(`Listening on port: http://127.0.0.1:${this.localPort}`))
+    if(!this.headless) {
+        await open(`http://127.0.0.1:${this.localPort}`)
+        console.log(info('Launched bull-board in browser'))
     }
-
-    async start(): Promise<void> {
-        console.log(info('Starting application!'))
-        // Setup UI
-        const app = express()
-        const port = await getPort()
-        app.use('/', UI)
-        this.server = app.listen(port)
-        
-        console.log(info(`Listening on port: http://127.0.0.1:${port}`))
-        if(!this.headless) {
-            await open(`http://127.0.0.1:${port}`)
-            console.log(info('Launched bull-board in browser'))
-        }
 
     let i = 1
     let n = this.uploaderProvider.totalRecords;
@@ -84,8 +87,21 @@ export class App {
       }
     }
 
-    console.log(pretty('Executing patch files ...'));
+    function waitForUser(query: string) {
+      const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+      });
 
+      return new Promise(resolve => rl.question(query, ans => {
+          rl.close();
+          resolve(ans);
+      }))
+    }
+
+    await waitForUser('Please wait for all of upload_queue to process before executing patchfiles. Press [Enter] to continue.');
+
+    console.log(pretty('Executing patch files ...'));
     for(let item of this.patchFiles.flat()) {
       this.uploaderProvider.queue.add(JSON.parse(fs.readFileSync(item, { encoding: 'utf8' })), {
         attempts: 3,
@@ -139,4 +155,5 @@ export interface AppOptions {
     redis?: string;
     jobs?: number;
     headless: boolean;
+    localPort: number;
 }

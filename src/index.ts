@@ -17,7 +17,8 @@ program
   .version(packagejson.version)
   .description(packagejson.description)
   .arguments('<bundle.tar.gz>')
-  .option('--host <url>',' Use this host instead of the default.', '<none>')
+  .option('--remotehost <url>','Use this host instead of the default.', '<none>')
+  .option('--localport <port>', 'Use this host instead of the default.', '<none>')
   .option('--verify', 'When enabled, only validate the access token and exit.', false)
   .option('--jobs <integer>', 'Number of concurrent uploads to make. Defaults to # of CPU cores.', `${os.cpus().length}`)
   .option('--verbose', 'When enabled, certain logging will be more verbose.', false)
@@ -26,8 +27,8 @@ program
   .option('--headless', 'When enabled, a browser won\'t be opened to the job management page.')
   .action(async file => {
     let api = new API(program.token, true);
-    if(program.host !== '<none>') {
-      api.baseUrl = program.host;
+    if(program.remotehost !== '<none>') {
+      api.baseUrl = program.remotehost;
     }
     if(program.token !== '<none>') {
       api.accessToken = program.token;
@@ -56,7 +57,8 @@ program
       patchFiles: details.patchFiles,
       redis: program.redis,
       jobs: parseInt(program.jobs),
-      headless: program.headless
+      headless: program.headless,
+      localPort: program.localport,
     });
     await app.start();
     await bundle.cleanup(details.root);

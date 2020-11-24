@@ -121,3 +121,4 @@ lib/
 #large_sample.csv
 # bundles
 *.tar.gz
+*.tar
