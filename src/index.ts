@@ -22,6 +22,7 @@ program
     .option('--verbose', 'When enabled, certain logging will be more verbose.', false)
     .option('--redis <connection>', 'Redis information', 'redis://127.0.0.1:6379')
     .option('--token <access_token>','Specify your access token for upload permissions. Must have permissions to use: `PUT /api/private/CSV`. This can also be specified with the ACCESS_TOKEN environment variable.',`<none>`)
+    .option('--headless', 'When enabled, a browser won\'t be opened to the job management page.')
     .action(async csv => {
         let api = new API(program.token, true);
         if(program.host !== '<none>') {
@@ -53,7 +54,8 @@ program
             api: api,
             csvFiles: csv,
             redis: program.redis,
-            jobs: parseInt(program.jobs)
+            jobs: parseInt(program.jobs),
+            headless: program.headless
         });
         await app.start();
     })

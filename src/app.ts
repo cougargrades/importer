@@ -19,6 +19,7 @@ export class App {
     csvFiles: string[];
     uploaderProvider: UploaderProvider;
     server?: Server;
+    headless: boolean;
 
     constructor(options: AppOptions) {
         // Initialize data streams
@@ -29,6 +30,7 @@ export class App {
             redis: options.redis || 'redis://127.0.0.1:6379',
             jobs: options.jobs || os.cpus().length
         });
+        this.headless = options.headless;
     }
 
     async start(): Promise<void> {
@@ -40,8 +42,10 @@ export class App {
         this.server = app.listen(port)
         
         console.log(info(`Listening on port: http://127.0.0.1:${port}`))
-        await open(`http://127.0.0.1:${port}`)
-        console.log(info('Launched bull-board in browser'))
+        if(!this.headless) {
+            await open(`http://127.0.0.1:${port}`)
+            console.log(info('Launched bull-board in browser'))
+        }
 
         let i = 1
         let n = this.uploaderProvider.totalRecords
@@ -117,4 +121,5 @@ export interface AppOptions {
     csvFiles?: string[];
     redis?: string;
     jobs?: number;
+    headless: boolean;
 }
