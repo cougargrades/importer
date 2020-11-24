@@ -119,3 +119,5 @@ lib/
 !sample.csv
 *.csv
 #large_sample.csv
+# bundles
+*.tar.gz
