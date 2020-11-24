@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import parse from 'csv-parse'
-import { GradeDistributionCSVRow } from '@cougargrades/types'
+import { GradeDistributionCSVRow } from '@cougargrades/types/dist/GradeDistributionCSVRow'
 
 export class CSVReader {
   filePath: string;
@@ -46,22 +46,22 @@ export class CSVReader {
           // read the rows into the typed object
           let formatted: GradeDistributionCSVRow[] = [];
           for (let item of records) {
-            formatted.push(new GradeDistributionCSVRow(
-              item['TERM'],
-              item['SUBJECT'],
-              item['CATALOG_NBR'],
-              parseInt(item['CLASS_SECTION']),
-              item['COURSE_DESCR'],
-              item['INSTR_LAST_NAME'],
-              item['INSTR_FIRST_NAME'],
-              parseInt(item['A']),
-              parseInt(item['B']),
-              parseInt(item['C']),
-              parseInt(item['D']),
-              parseInt(item['F']),
-              parseInt(item['TOTAL_DROPPED']),
-              parseFloat(item['AVG_GPA'])
-            ));
+            formatted.push({
+              TERM: item['TERM'],
+              SUBJECT: item['SUBJECT'],
+              CATALOG_NBR: item['CATALOG_NBR'],
+              CLASS_SECTION: parseInt(item['CLASS_SECTION']),
+              COURSE_DESCR: item['COURSE_DESCR'],
+              INSTR_LAST_NAME: item['INSTR_LAST_NAME'],
+              INSTR_FIRST_NAME: item['INSTR_FIRST_NAME'],
+              A: parseInt(item['A']),
+              B: parseInt(item['B']),
+              C: parseInt(item['C']),
+              D: parseInt(item['D']),
+              F: parseInt(item['F']),
+              TOTAL_DROPPED: parseInt(item['TOTAL_DROPPED']),
+              AVG_GPA: parseFloat(item['AVG_GPA'])
+            });
           }
           // send it off
           resolve(formatted);

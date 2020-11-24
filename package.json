@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/cougargrades/importer#readme",
   "dependencies": {
-    "@cougargrades/types": "0.0.37",
+    "@cougargrades/types": "0.0.41",
     "@types/bull": "^3.12.1",
     "@types/bull-board": "^0.6.0",
     "@types/cli-progress": "^3.4.2",
