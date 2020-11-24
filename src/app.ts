@@ -6,6 +6,7 @@ import readline from 'readline';
 import { API } from './api';
 import { UploaderProvider } from './providers';
 import { MultiBar, SingleBar, Presets } from 'cli-progress';
+import { snooze } from '@au5ton/snooze';
 
 import express from 'express';
 import { UI } from 'bull-board';
@@ -17,7 +18,6 @@ import { Server } from 'http';
 const info = chalk.grey
 const success = chalk.greenBright.bold;
 const pretty = chalk.cyanBright.bold;
-const snooze = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class App {
   csvFiles: string[];
@@ -99,7 +99,14 @@ export class App {
       }))
     }
 
-    await waitForUser('Please wait for all of upload_queue to process before executing patchfiles. Press [Enter] to continue.');
+    console.log('Waiting for serverside queue to empty...');
+    // Wait for serverside queue to empty
+    while(await this.uploaderProvider.getServerQueueSize() === 0) {
+      await snooze(5000);
+    }
+    console.log('Serverside queue has emptied!');
+
+    //await waitForUser('Please wait for all of upload_queue to process before executing patchfiles. Press [Enter] to continue.');
 
     console.log(pretty('Executing patch files ...'));
     for(let item of this.patchFiles.flat()) {

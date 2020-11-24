@@ -64,6 +64,16 @@ export class UploaderProvider {
     })
   }
 
+  async getServerQueueSize(): Promise<number> {
+    let res = await this.api.get('/private/upload_queue');
+    if(res.status === 200) {
+      return await res.json() as number;
+    }
+    else {
+      return -1;
+    }
+  }
+
   async allRows(callback: (data: Bull.Job<any>) => void) {
     // literally load every row into memory like a fucking madlad
     const payload = await Promise.all(this.readers.map(e => e.allRows()));

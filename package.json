@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/cougargrades/importer#readme",
   "dependencies": {
+    "@au5ton/snooze": "^1.0.3",
     "@cougargrades/types": "0.0.41",
     "@types/bull": "^3.12.1",
     "@types/bull-board": "^0.6.0",
