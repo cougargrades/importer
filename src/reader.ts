@@ -57,13 +57,13 @@ export class CSVReader {
               COURSE_DESCR: item['COURSE_DESCR'],
               INSTR_LAST_NAME: item['INSTR_LAST_NAME'],
               INSTR_FIRST_NAME: item['INSTR_FIRST_NAME'],
-              A: is_nullish(item['A']) ? 0 : parseInt(item['A']),
-              B: is_nullish(item['B']) ? 0 : parseInt(item['B']),
-              C: is_nullish(item['C']) ? 0 : parseInt(item['C']),
-              D: is_nullish(item['D']) ? 0 : parseInt(item['D']),
-              F: is_nullish(item['F']) ? 0 : parseInt(item['F']),
-              TOTAL_DROPPED: is_nullish(item['TOTAL_DROPPED']) ? 0 : parseInt(item['TOTAL_DROPPED']),
-              AVG_GPA: is_nullish(item['AVG_GPA']) ? 0 : parseInt(item['AVG_GPA'])
+              A: item['A'] === '' ? undefined : parseInt(item['A']),
+              B: item['B'] === '' ? undefined : parseInt(item['B']),
+              C: item['C'] === '' ? undefined : parseInt(item['C']),
+              D: item['D'] === '' ? undefined : parseInt(item['D']),
+              F: item['F'] === '' ? undefined : parseInt(item['F']),
+              TOTAL_DROPPED: item['TOTAL_DROPPED'] === '' ? undefined : parseInt(item['TOTAL_DROPPED']),
+              AVG_GPA: item['AVG_GPA'] === '' ? undefined : parseInt(item['AVG_GPA']),
             });
           }
           // send it off
